@@ -234,7 +234,8 @@ function gameLoop() {
             if (game.match) {
                 game.match.update();
                 game.match.draw();
-                break;
+            }
+            break;
 
         case GameState.UPGRADE:
             drawUpgradeScreen();
