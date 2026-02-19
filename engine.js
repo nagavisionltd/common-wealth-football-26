@@ -30,7 +30,13 @@ canvas.addEventListener('mousemove', e => {
     mouse.x = (e.clientX - r.left) * (CANVAS_W / r.width);
     mouse.y = (e.clientY - r.top) * (CANVAS_H / r.height);
 });
-canvas.addEventListener('mousedown', () => { mouse.clicked = true; mouse.down = true; });
+canvas.addEventListener('mousedown', (e) => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = (e.clientX - r.left) * (CANVAS_W / r.width);
+    mouse.y = (e.clientY - r.top) * (CANVAS_H / r.height);
+    mouse.clicked = true;
+    mouse.down = true;
+});
 canvas.addEventListener('mouseup', () => { mouse.down = false; });
 
 // Utility

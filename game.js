@@ -35,9 +35,6 @@ const game = {
     level: 1,
     xp: 0,
     coins: 200,
-    assets: {
-        titleBg: new Image(),
-    },
     skillPoints: 3,
     currentCity: 0,
     cityWins: [0, 0, 0, 0, 0, 0],
@@ -225,6 +222,28 @@ function gameLoop() {
     // Clear
     ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
+    // --- Handle Transition System ---
+    if (game.transition.active) {
+        game.transition.timer++;
+        if (game.transition.mode === 'out') {
+            // Fade to black
+            const progress = game.transition.timer / game.transition.duration;
+            if (progress >= 1) {
+                // Switch state at peak of fade
+                game.state = game.transition.targetState;
+                game.transition.mode = 'in';
+                game.transition.timer = 0;
+            }
+        } else if (game.transition.mode === 'in') {
+            // Fade from black
+            const progress = game.transition.timer / game.transition.duration;
+            if (progress >= 1) {
+                game.transition.active = false;
+                game.transition.timer = 0;
+            }
+        }
+    }
+
     // Update & Draw current state
     switch (game.state) {
         case GameState.TITLE: drawTitleScreen(); break;
@@ -235,6 +254,10 @@ function gameLoop() {
                 game.match.update();
                 game.match.draw();
             }
+            break;
+
+        case GameState.MATCH_RESULT:
+            drawMatchResult();
             break;
 
         case GameState.UPGRADE:
@@ -272,6 +295,18 @@ function gameLoop() {
                 }
             }
             break;
+    }
+
+    // --- Draw Transition Overlay ---
+    if (game.transition.active) {
+        let alpha = 0;
+        if (game.transition.mode === 'out') {
+            alpha = game.transition.timer / game.transition.duration;
+        } else {
+            alpha = 1 - (game.transition.timer / game.transition.duration);
+        }
+        ctx.fillStyle = `rgba(0, 0, 0, ${clamp(alpha, 0, 1)})`;
+        ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
     }
 
     // Reset click state at end of frame
